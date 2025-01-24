@@ -1,5 +1,6 @@
 import 'package:blog_app/core/configs/supabase_configs.dart';
 import 'package:blog_app/viewmodels/auth_viewmodel.dart';
+import 'package:blog_app/viewmodels/blog_viewmodel.dart';
 import 'package:blog_app/views/home_page.dart';
 import 'package:blog_app/views/signin_page.dart';
 import 'package:flutter/material.dart';
@@ -20,6 +21,7 @@ void main() async {
         ChangeNotifierProvider(
           create: (_) => AuthViewModel()..initialize(),
         ),
+        ChangeNotifierProvider(create: (_) => BlogViewModel())
       ],
       child: const MyApp(),
     ),
