@@ -1,5 +1,7 @@
+import 'package:blog_app/viewmodels/auth_viewmodel.dart';
 import 'package:blog_app/viewmodels/blog_viewmodel.dart';
 import 'package:blog_app/views/create_blog_page.dart';
+import 'package:blog_app/views/signin_page.dart';
 import 'package:blog_app/views/view_blog_page.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -36,6 +38,13 @@ class _HomePageState extends State<HomePage> {
       appBar: AppBar(
         title: Text('Blog App'),
         actions: [
+          IconButton(
+              onPressed: () {
+                context.read<AuthViewModel>().signOut();
+                Navigator.pushReplacement(context,
+                    MaterialPageRoute(builder: (context) => SignInPage()));
+              },
+              icon: Icon(Icons.logout)),
           IconButton(
             icon: Icon(Icons.refresh),
             onPressed: () => context.read<BlogViewModel>().fetchBlogs(),

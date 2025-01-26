@@ -1,28 +1,35 @@
+import 'package:flutter/cupertino.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class AuthService {
   final supabase = Supabase.instance.client;
+  AuthResponse? _response;
+  AuthResponse? get response => _response;
 
-  // Email validation regex
   static final RegExp _emailRegExp = RegExp(
     r'^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$',
   );
 
-  // Password validation regex (minimum 8 chars, 1 uppercase, 1 lowercase, 1 number)
   static final RegExp _passwordRegExp = RegExp(
     r'^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$',
   );
 
   Future<void> signUp(String email, String password) async {
-    if (!_isEmailValid(email)) {
-      throw AuthException('Invalid email format');
-    }
-    if (!_isPasswordValid(password)) {
-      throw AuthException(
-          'Password must be at least 8 characters with at least one letter and one number');
-    }
+    try {
+      if (!_isEmailValid(email)) {
+        throw AuthException('Invalid email format');
+      }
+      if (!_isPasswordValid(password)) {
+        throw AuthException(
+            'Password must be at least 8 characters with at least one letter and one number');
+      }
 
-    await supabase.auth.signUp(email: email, password: password);
+      _response = await supabase.auth.signUp(email: email, password: password);
+      debugPrint(
+          "[AuthService.signUp] : User signed up successfully ${response!.user!.id}");
+    } catch (e) {
+      throw AuthException('Sign-up failed: ${e.toString()}');
+    }
   }
 
   Future<void> signIn(String email, String password) async {

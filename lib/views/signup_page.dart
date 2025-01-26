@@ -4,13 +4,27 @@ import 'package:blog_app/views/signin_page.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class SignUpPage extends StatelessWidget {
+class SignUpPage extends StatefulWidget {
+  SignUpPage({super.key});
+
+  @override
+  _SignUpPageState createState() => _SignUpPageState();
+}
+
+class _SignUpPageState extends State<SignUpPage> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   final TextEditingController confirmPasswordController =
       TextEditingController();
 
-  SignUpPage({super.key});
+  @override
+  void dispose() {
+    emailController.dispose();
+    passwordController.dispose();
+    confirmPasswordController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     final authViewModel = Provider.of<AuthViewModel>(context);
@@ -21,23 +35,23 @@ class SignUpPage extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            TextField(
-                controller: emailController,
-                decoration: InputDecoration(labelText: "Email")),
-            const SizedBox(
-              height: 10,
+            TextFormField(
+              controller: emailController,
+              decoration: const InputDecoration(labelText: "Email"),
+              keyboardType: TextInputType.emailAddress,
             ),
-            TextField(
-                controller: passwordController,
-                decoration: InputDecoration(labelText: "Password"),
-                obscureText: true),
-            const SizedBox(
-              height: 10,
+            const SizedBox(height: 10),
+            TextFormField(
+              controller: passwordController,
+              decoration: const InputDecoration(labelText: "Password"),
+              obscureText: true,
             ),
-            TextField(
-                controller: confirmPasswordController,
-                decoration: InputDecoration(labelText: "Confirm Password"),
-                obscureText: true),
+            const SizedBox(height: 10),
+            TextFormField(
+              controller: confirmPasswordController,
+              decoration: const InputDecoration(labelText: "Confirm Password"),
+              obscureText: true,
+            ),
             const SizedBox(height: 20),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -64,40 +78,49 @@ class SignUpPage extends StatelessWidget {
                 ),
               ],
             ),
+            const SizedBox(height: 20),
             ElevatedButton(
-              onPressed: () async {
-                await authViewModel.signUp(
-                    emailController.text, passwordController.text);
-                if (passwordController.text != confirmPasswordController.text) {
-                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                    content: Text('Please enter your password correctly'),
-                    backgroundColor: Colors.red,
-                  ));
-                  emailController.clear();
-                  passwordController.clear();
-                  confirmPasswordController.clear();
-                  return;
-                }
-                if (authViewModel.currentUser != null) {
-                  Navigator.pop(context);
-                  Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => HomePage()));
-                } else {
-                  // Show an error message if login fails
-                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                    content:
-                        Text('Sign Up failed. Please check your credentials.'),
-                    backgroundColor: Colors.red,
-                  ));
-                  emailController.clear();
-                  passwordController.clear();
-                  confirmPasswordController.clear();
-                  return;
-                }
-              },
+              onPressed: authViewModel.isLoading
+                  ? null
+                  : () async {
+                      debugPrint(
+                          "[SignUpPage:ElevatedButton:onPressed] : button clicked");
+
+                      if (passwordController.text !=
+                          confirmPasswordController.text) {
+                        ScaffoldMessenger.of(context)
+                            .showSnackBar(const SnackBar(
+                          content: Text('Passwords do not match!'),
+                          backgroundColor: Colors.red,
+                        ));
+                        passwordController.clear();
+                        confirmPasswordController.clear();
+                        return;
+                      }
+
+                      await authViewModel.signUp(
+                        emailController.text,
+                        passwordController.text,
+                      );
+
+                      if (authViewModel.errorMessage != null) {
+                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                          content: Text(authViewModel.errorMessage!),
+                          backgroundColor: Colors.red,
+                        ));
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text("Sign Up Successful")),
+                        );
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(builder: (context) => HomePage()),
+                        );
+                      }
+                    },
               child: authViewModel.isLoading
-                  ? CircularProgressIndicator()
-                  : Text("Login"),
+                  ? const CircularProgressIndicator()
+                  : const Text("Sign Up"),
             ),
           ],
         ),

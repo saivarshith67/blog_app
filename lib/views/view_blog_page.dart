@@ -1,4 +1,5 @@
 import 'package:blog_app/models/blog.dart';
+import 'package:blog_app/views/update_blog_page.dart';
 import 'package:flutter/material.dart';
 
 class ViewBlogPage extends StatelessWidget {
@@ -28,6 +29,17 @@ class ViewBlogPage extends StatelessWidget {
             ),
           ],
         ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => UpdateBlogPage(
+                        blog: blog,
+                      )));
+        },
+        child: Icon(Icons.edit),
       ),
     );
   }
