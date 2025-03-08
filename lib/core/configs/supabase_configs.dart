@@ -1,5 +1,5 @@
 class SupabaseConfig {
-  static final _projectUrl = "https://aikeyorkamcnqlefxebg.supabase.co";
+  static final _projectUrl = "";
   static final _annonKey =
       "";
 
